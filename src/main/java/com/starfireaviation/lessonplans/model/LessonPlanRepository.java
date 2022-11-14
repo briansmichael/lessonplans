@@ -19,25 +19,26 @@ package com.starfireaviation.lessonplans.model;
 import org.springframework.data.repository.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * LessonPlanRepository.
  */
-public interface LessonPlanRepository extends Repository<LessonPlan, Long> {
+public interface LessonPlanRepository extends Repository<LessonPlanEntity, Long> {
 
     /**
      * Deletes a lessonPlan.
      *
      * @param lessonPlan LessonPlanEntity
      */
-    void delete(LessonPlan lessonPlan);
+    void delete(LessonPlanEntity lessonPlan);
 
     /**
      * Gets all lessonPlan.
      *
      * @return list of LessonPlanEntity
      */
-    List<LessonPlan> findAll();
+    Optional<List<LessonPlanEntity>> findAll();
 
     /**
      * Gets a lessonPlan.
@@ -45,7 +46,7 @@ public interface LessonPlanRepository extends Repository<LessonPlan, Long> {
      * @param id Long
      * @return LessonPlanEntity
      */
-    LessonPlan findById(long id);
+    Optional<LessonPlanEntity> findById(Long id);
 
     /**
      * Saves a lessonPlan.
@@ -53,5 +54,5 @@ public interface LessonPlanRepository extends Repository<LessonPlan, Long> {
      * @param lessonPlan LessonPlanEntity
      * @return LessonPlanEntity
      */
-    LessonPlan save(LessonPlan lessonPlan);
+    LessonPlanEntity save(LessonPlanEntity lessonPlan);
 }

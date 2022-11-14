@@ -16,7 +16,7 @@
 
 package com.starfireaviation.lessonplans.model;
 
-import com.starfireaviation.model.CommonConstants;
+import com.starfireaviation.common.CommonConstants;
 import lombok.Data;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
@@ -27,10 +27,8 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
-import javax.persistence.Transient;
 import java.io.Serializable;
 import java.util.Date;
-import java.util.List;
 
 /**
  * LessonPlan.
@@ -38,7 +36,7 @@ import java.util.List;
 @Data
 @Entity
 @Table(name = "LESSON_PLAN")
-public class LessonPlan implements Serializable {
+public class LessonPlanEntity implements Serializable {
 
     /**
      * Default SerialVersionUID.
@@ -69,7 +67,7 @@ public class LessonPlan implements Serializable {
     /**
      * Title.
      */
-    @Column(name = "title", nullable = false, length = CommonConstants.TWO_HUNDRED_FIFTY_FIVE)
+    @Column(name = "title", nullable = false)
     private String title;
 
     /**
@@ -119,11 +117,5 @@ public class LessonPlan implements Serializable {
      */
     @Column(name = "completion_standards", length = CommonConstants.TWO_THOUSAND)
     private String completionStandards;
-
-    /**
-     * Activities.
-     */
-    @Transient
-    private List<Activity> activities;
 
 }

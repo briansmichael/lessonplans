@@ -16,11 +16,9 @@
 
 package com.starfireaviation.lessonplans.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.starfireaviation.model.CommonConstants;
+import com.starfireaviation.common.CommonConstants;
+import com.starfireaviation.common.model.ActivityType;
 import lombok.Data;
-import org.hibernate.annotations.OnDelete;
-import org.hibernate.annotations.OnDeleteAction;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 
@@ -28,12 +26,9 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import java.io.Serializable;
 import java.util.Date;
@@ -44,7 +39,7 @@ import java.util.Date;
 @Data
 @Entity
 @Table(name = "ACTIVITY")
-public class Activity implements Serializable {
+public class ActivityEntity implements Serializable {
 
     /**
      * Default SerialVersionUID.
@@ -96,14 +91,5 @@ public class Activity implements Serializable {
      */
     @Column(name = "reference_id")
     private Long referenceId;
-
-    /**
-     * LessonPlan.
-     */
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "lesson_plan_id", nullable = false)
-    @OnDelete(action = OnDeleteAction.CASCADE)
-    @JsonIgnore
-    private LessonPlan lessonPlan;
 
 }

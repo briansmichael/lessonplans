@@ -19,25 +19,26 @@ package com.starfireaviation.lessonplans.model;
 import org.springframework.data.repository.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * ActivityRepository.
  */
-public interface ActivityRepository extends Repository<Activity, Long> {
+public interface ActivityRepository extends Repository<ActivityEntity, Long> {
 
     /**
      * Deletes an activity.
      *
      * @param activity Activity
      */
-    void delete(Activity activity);
+    void delete(ActivityEntity activity);
 
     /**
      * Gets all activities.
      *
      * @return list of Activity
      */
-    List<Activity> findAll();
+    Optional<List<ActivityEntity>> findAll();
 
     /**
      * Gets all addresses for an event.
@@ -45,7 +46,7 @@ public interface ActivityRepository extends Repository<Activity, Long> {
      * @param lessonPlanId LessonPlan ID
      * @return list of Activity
      */
-    List<Activity> findActivityByLessonPlanId(Long lessonPlanId);
+    Optional<List<ActivityEntity>> findByLessonPlanId(Long lessonPlanId);
 
     /**
      * Gets an activity.
@@ -53,13 +54,13 @@ public interface ActivityRepository extends Repository<Activity, Long> {
      * @param id Long
      * @return Activity
      */
-    Activity findById(long id);
+    Optional<ActivityEntity> findById(Long id);
 
     /**
-     * Saves a activity.
+     * Saves an activity.
      *
      * @param activity Activity
      * @return Activity
      */
-    Activity save(Activity activity);
+    ActivityEntity save(ActivityEntity activity);
 }

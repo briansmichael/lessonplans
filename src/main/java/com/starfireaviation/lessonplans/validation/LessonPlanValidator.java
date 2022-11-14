@@ -16,13 +16,13 @@
 
 package com.starfireaviation.lessonplans.validation;
 
-import com.starfireaviation.lessonplans.exception.AccessDeniedException;
-import com.starfireaviation.lessonplans.exception.InvalidPayloadException;
-import com.starfireaviation.lessonplans.exception.ResourceNotFoundException;
-import com.starfireaviation.lessonplans.model.LessonPlan;
+import com.starfireaviation.common.exception.AccessDeniedException;
+import com.starfireaviation.common.exception.InvalidPayloadException;
+import com.starfireaviation.common.exception.ResourceNotFoundException;
+import com.starfireaviation.common.model.LessonPlan;
 import com.starfireaviation.lessonplans.service.DataService;
-import com.starfireaviation.model.Role;
-import com.starfireaviation.model.User;
+import com.starfireaviation.common.model.Role;
+import com.starfireaviation.common.model.User;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
@@ -200,7 +200,7 @@ public class LessonPlanValidator {
         boolean authenticatedUser = false;
         try {
             empty(principal);
-            final User loggedInUser = dataService.findByUsername(principal.getName());
+            final User loggedInUser = dataService.getUser(principal.getName());
             if (userId == loggedInUser.getId()) {
                 authenticatedUser = true;
             }

@@ -14,31 +14,7 @@
  *  limitations under the License.
  */
 
-package com.starfireaviation.lessonplans.model;
-
 /**
- * ActivityType.
+ * Validation classes.
  */
-public enum ActivityType {
-
-    /**
-     * OTHER.
-     */
-    OTHER,
-    /**
-     * QUIZ.
-     */
-    QUIZ,
-    /**
-     * LESSON.
-     */
-    LESSON,
-    /**
-     * REVIEW.
-     */
-    REVIEW,
-    /**
-     * HANDS_ON.
-     */
-    HANDS_ON;
-}
+package com.starfireaviation.lessonplans.validation;

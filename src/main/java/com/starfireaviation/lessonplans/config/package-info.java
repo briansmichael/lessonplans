@@ -14,27 +14,7 @@
  *  limitations under the License.
  */
 
-package com.starfireaviation.lessonplans.config;
-
-import lombok.Getter;
-import lombok.Setter;
-import org.springframework.boot.context.properties.ConfigurationProperties;
-
 /**
- * Application Properties.
+ * Configuration classes.
  */
-@Getter
-@Setter
-@ConfigurationProperties("lessonplans")
-public class ApplicationProperties {
-
-    /**
-     * Connect Timeout.
-     */
-    private int connectTimeout;
-
-    /**
-     * Read Timeout.
-     */
-    private int readTimeout;
-}
+package com.starfireaviation.lessonplans.config;

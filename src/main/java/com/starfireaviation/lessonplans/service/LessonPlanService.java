@@ -16,15 +16,19 @@
 
 package com.starfireaviation.lessonplans.service;
 
-import com.starfireaviation.lessonplans.exception.ResourceNotFoundException;
-import com.starfireaviation.lessonplans.model.Activity;
+import com.starfireaviation.common.exception.ResourceNotFoundException;
+import com.starfireaviation.lessonplans.model.ActivityEntity;
 import com.starfireaviation.lessonplans.model.ActivityRepository;
-import com.starfireaviation.lessonplans.model.LessonPlan;
+import com.starfireaviation.lessonplans.model.LessonPlanActivity;
+import com.starfireaviation.lessonplans.model.LessonPlanActivityRepository;
+import com.starfireaviation.lessonplans.model.LessonPlanEntity;
 import com.starfireaviation.lessonplans.model.LessonPlanRepository;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * LessonPlanService.
@@ -38,6 +42,11 @@ public class LessonPlanService {
     private final LessonPlanRepository lessonPlanRepository;
 
     /**
+     * LessonPlanRepository.
+     */
+    private final LessonPlanActivityRepository lessonPlanActivityRepository;
+
+    /**
      * ActivityRepository.
      */
     private final ActivityRepository activityRepository;
@@ -46,11 +55,14 @@ public class LessonPlanService {
      * LessonPlanService.
      *
      * @param lpRepository LessonPlanRepository
+     * @param lpaRepository LessonPlanActivityRepository
      * @param aRepostory   ActivityRepository
      */
     public LessonPlanService(final LessonPlanRepository lpRepository,
+                             final LessonPlanActivityRepository lpaRepository,
                              final ActivityRepository aRepostory) {
         lessonPlanRepository = lpRepository;
+        lessonPlanActivityRepository = lpaRepository;
         activityRepository = aRepostory;
     }
 
@@ -61,74 +73,99 @@ public class LessonPlanService {
      * @return LessonPlan
      * @throws ResourceNotFoundException when resultant lesson plan is not found
      */
-    public LessonPlan store(final LessonPlan lessonPlan) throws ResourceNotFoundException {
+    public LessonPlanEntity store(final LessonPlanEntity lessonPlan) throws ResourceNotFoundException {
         if (lessonPlan == null) {
             return null;
         }
-        final LessonPlan lessonPlanEntity = lessonPlanRepository.save(lessonPlan);
-        if (lessonPlan.getActivities() != null) {
-            lessonPlan
-                    .getActivities()
-                    .forEach(activity -> {
-                        activity.setLessonPlan(lessonPlanEntity);
-                        activityRepository.save(activity);
-                    });
-        }
-        return get(lessonPlanEntity.getId());
+        return lessonPlanRepository.save(lessonPlan);
     }
 
     /**
      * Deletes a lessonPlan.
      *
-     * @param id Long
-     * @return LessonPlan
+     * @param lessonPlanId Long
      * @throws ResourceNotFoundException when lesson plan is not found
      */
-    public LessonPlan delete(final long id) throws ResourceNotFoundException {
-        final LessonPlan lessonPlan = get(id);
-        if (lessonPlan != null) {
-            if (lessonPlan.getActivities() != null) {
-                lessonPlan
-                        .getActivities()
-                        .forEach(activityRepository::delete);
-            }
-            lessonPlanRepository.delete(lessonPlan);
-        }
-        return lessonPlan;
+    public void delete(final Long lessonPlanId) throws ResourceNotFoundException {
+        lessonPlanActivityRepository
+                .findByLessonPlanId(lessonPlanId)
+                .orElse(new ArrayList<>())
+                .forEach(lessonPlanActivityRepository::delete);
+        lessonPlanRepository.delete(get(lessonPlanId));
     }
 
     /**
      * Gets all lessonPlan.
      *
      * @return list of LessonPlan
-     * @throws ResourceNotFoundException when lesson plan is not found
      */
-    public List<LessonPlan> getAll() throws ResourceNotFoundException {
-        final List<LessonPlan> lessonPlans = new ArrayList<>();
-        final List<LessonPlan> lessonPlanEntities = lessonPlanRepository.findAll();
-        for (final LessonPlan lessonPlanEntity : lessonPlanEntities) {
-            lessonPlans.add(get(lessonPlanEntity.getId()));
-        }
-        return lessonPlans;
+    public List<LessonPlanEntity> getAll() {
+        return lessonPlanRepository.findAll().orElseThrow();
     }
 
     /**
      * Gets a lessonPlan.
      *
-     * @param id Long
+     * @param lessonPlanId Long
      * @return LessonPlan
      * @throws ResourceNotFoundException when lesson plan is not found
      */
-    public LessonPlan get(final long id) throws ResourceNotFoundException {
-        final LessonPlan lessonPlan = lessonPlanRepository.findById(id);
+    public LessonPlanEntity get(final long lessonPlanId) throws ResourceNotFoundException {
+        final LessonPlanEntity lessonPlan = lessonPlanRepository.findById(lessonPlanId).orElse(null);
         if (lessonPlan == null) {
-            throw new ResourceNotFoundException(String.format("No lesson plan found for ID [%s]", id));
-        }
-        final List<Activity> activityEntities = activityRepository.findActivityByLessonPlanId(id);
-        if (activityEntities != null) {
-            lessonPlan.setActivities(new ArrayList<>(activityEntities));
+            throw new ResourceNotFoundException(String.format("No lesson plan found for ID [%s]", lessonPlanId));
         }
         return lessonPlan;
     }
 
+    /**
+     * Gets list of Activities for the given LessonPlan.
+     *
+     * @param lessonPlanId LessonPlan ID
+     * @return list of ActivityEntity
+     */
+    public List<ActivityEntity> getActivitiesForLessonPlan(final Long lessonPlanId) {
+        return lessonPlanActivityRepository
+                .findByLessonPlanId(lessonPlanId)
+                .orElse(new ArrayList<>())
+                .stream()
+                .map(lessonPlanActivity -> activityRepository
+                        .findById(lessonPlanActivity.getActivityId())
+                        .orElse(new ActivityEntity()))
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * Links Activity to a LessonPlan.
+     *
+     * @param lessonPlanId LessonPlan ID
+     * @param activityEntities list of Activity
+     */
+    public void linkActivities(final Long lessonPlanId, final List<ActivityEntity> activityEntities) {
+        final List<Long> existing = new ArrayList<>();
+        final List<Long> activityIds = activityEntities
+                .stream()
+                .map(ActivityEntity::getId)
+                .collect(Collectors.toList());
+        lessonPlanActivityRepository
+                .findByLessonPlanId(lessonPlanId)
+                .orElse(new ArrayList<>())
+                .stream()
+                .filter(lessonPlanActivity -> !activityIds.contains(lessonPlanActivity.getActivityId()))
+                .forEach(lessonPlanActivity -> existing.add(activityRepository
+                        .findById(lessonPlanActivity.getActivityId())
+                        .orElse(new ActivityEntity())
+                        .getId()));
+        for (final ActivityEntity activityEntity : activityEntities) {
+            if (!existing.contains(activityEntity.getId())) {
+                final LessonPlanActivity lessonPlanActivity = new LessonPlanActivity();
+                lessonPlanActivity.setActivityId(activityEntity.getId());
+                lessonPlanActivity.setLessonPlanId(lessonPlanId);
+                lessonPlanActivity.setCreatedAt(new Date());
+                lessonPlanActivity.setUpdatedAt(new Date());
+                lessonPlanActivityRepository.save(lessonPlanActivity);
+            }
+        }
+        // TODO handle removing IDs that should be de-linked
+    }
 }

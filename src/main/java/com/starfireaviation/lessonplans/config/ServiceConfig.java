@@ -17,47 +17,16 @@
 package com.starfireaviation.lessonplans.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.starfireaviation.groundschool.jobs.UpdateCourses;
-import com.starfireaviation.groundschool.model.ActivityRepository;
-import com.starfireaviation.groundschool.model.AddressRepository;
-import com.starfireaviation.groundschool.model.AnswerRepository;
-import com.starfireaviation.groundschool.model.CommentRepository;
-import com.starfireaviation.groundschool.model.EventParticipantRepository;
-import com.starfireaviation.groundschool.model.EventRepository;
-import com.starfireaviation.groundschool.model.LessonPlanRepository;
-import com.starfireaviation.groundschool.model.QuestionReferenceMaterialRepository;
-import com.starfireaviation.groundschool.model.QuestionRepository;
-import com.starfireaviation.groundschool.model.QuizQuestionRepository;
-import com.starfireaviation.groundschool.model.QuizRepository;
-import com.starfireaviation.groundschool.model.ReferenceMaterialRepository;
-import com.starfireaviation.groundschool.model.UserRepository;
-import com.starfireaviation.groundschool.service.AddressService;
-import com.starfireaviation.groundschool.service.AnswerService;
-import com.starfireaviation.groundschool.service.CommentService;
-import com.starfireaviation.groundschool.service.EventService;
-import com.starfireaviation.groundschool.service.LessonPlanService;
-import com.starfireaviation.groundschool.service.LessonService;
-import com.starfireaviation.groundschool.service.NotificationService;
-import com.starfireaviation.groundschool.service.QuestionService;
-import com.starfireaviation.groundschool.service.QuizService;
-import com.starfireaviation.groundschool.service.ReferenceMaterialService;
-import com.starfireaviation.groundschool.service.UserService;
-import com.starfireaviation.groundschool.util.GSDecryptor;
-import com.starfireaviation.groundschool.validation.CommentValidator;
-import com.starfireaviation.groundschool.validation.EventValidator;
-import com.starfireaviation.groundschool.validation.LessonValidator;
-import com.starfireaviation.groundschool.validation.QuizValidator;
-import com.starfireaviation.groundschool.validation.ReferenceMaterialValidator;
-import com.starfireaviation.groundschool.validation.UserValidator;
+import com.hazelcast.config.Config;
+import com.hazelcast.config.MapConfig;
+import com.hazelcast.core.Hazelcast;
+import com.hazelcast.core.HazelcastInstance;
+import com.starfireaviation.common.CommonConstants;
 import com.starfireaviation.lessonplans.model.ActivityRepository;
+import com.starfireaviation.lessonplans.model.LessonPlanActivityRepository;
 import com.starfireaviation.lessonplans.model.LessonPlanRepository;
 import com.starfireaviation.lessonplans.service.LessonPlanService;
 import lombok.extern.slf4j.Slf4j;
-import org.quartz.CronScheduleBuilder;
-import org.quartz.JobBuilder;
-import org.quartz.JobDetail;
-import org.quartz.Trigger;
-import org.quartz.TriggerBuilder;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
@@ -80,13 +49,15 @@ public class ServiceConfig {
      * LessonPlanService.
      *
      * @param lpRepository LessonPlanRepository
+     * @param lpaRepository LessonPlanActivityRepository
      * @param aRepostory   ActivityRepository
      * @return LessonPlanService
      */
     @Bean
     public LessonPlanService lessonPlanService(final LessonPlanRepository lpRepository,
+                                               final LessonPlanActivityRepository lpaRepository,
                                                final ActivityRepository aRepostory) {
-        return new LessonPlanService(lpRepository, aRepostory);
+        return new LessonPlanService(lpRepository, lpaRepository, aRepostory);
     }
 
     /**
@@ -128,6 +99,20 @@ public class ServiceConfig {
                 .setReadTimeout(Duration.ofMillis(props.getReadTimeout()))
                 .additionalMessageConverters(new MappingJackson2HttpMessageConverter())
                 .build();
+    }
+
+    /**
+     * Hazelcast LessonPlans Instance.
+     *
+     * @return HazelcastInstance
+     */
+    @Bean("lessonplans")
+    public HazelcastInstance hazelcastQuestionsInstance() {
+        return Hazelcast.newHazelcastInstance(
+                new Config().addMapConfig(
+                        new MapConfig("lessonplans")
+                                .setTimeToLiveSeconds(CommonConstants.THREE_HUNDRED)
+                                .setMaxIdleSeconds(CommonConstants.THREE_HUNDRED)));
     }
 
 }

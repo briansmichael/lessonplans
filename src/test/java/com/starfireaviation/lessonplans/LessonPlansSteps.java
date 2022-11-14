@@ -16,8 +16,9 @@
 
 package com.starfireaviation.lessonplans;
 
-import com.starfireaviation.lessonplans.model.LessonPlan;
-import com.starfireaviation.model.CommonConstants;
+import com.starfireaviation.common.model.LessonPlan;
+import com.starfireaviation.lessonplans.model.LessonPlanEntity;
+import com.starfireaviation.common.CommonConstants;
 import io.cucumber.java.Before;
 import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
