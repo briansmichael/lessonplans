@@ -107,10 +107,24 @@ public class ServiceConfig {
      * @return HazelcastInstance
      */
     @Bean("lessonplans")
-    public HazelcastInstance hazelcastQuestionsInstance() {
+    public HazelcastInstance hazelcastLessonPlansInstance() {
         return Hazelcast.newHazelcastInstance(
                 new Config().addMapConfig(
                         new MapConfig("lessonplans")
+                                .setTimeToLiveSeconds(CommonConstants.THREE_HUNDRED)
+                                .setMaxIdleSeconds(CommonConstants.THREE_HUNDRED)));
+    }
+
+    /**
+     * Hazelcast LessonPlans Instance.
+     *
+     * @return HazelcastInstance
+     */
+    @Bean("activities")
+    public HazelcastInstance hazelcastActivitiesInstance() {
+        return Hazelcast.newHazelcastInstance(
+                new Config().addMapConfig(
+                        new MapConfig("activities")
                                 .setTimeToLiveSeconds(CommonConstants.THREE_HUNDRED)
                                 .setMaxIdleSeconds(CommonConstants.THREE_HUNDRED)));
     }

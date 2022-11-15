@@ -41,14 +41,6 @@ public interface ActivityRepository extends Repository<ActivityEntity, Long> {
     Optional<List<ActivityEntity>> findAll();
 
     /**
-     * Gets all addresses for an event.
-     *
-     * @param lessonPlanId LessonPlan ID
-     * @return list of Activity
-     */
-    Optional<List<ActivityEntity>> findByLessonPlanId(Long lessonPlanId);
-
-    /**
      * Gets an activity.
      *
      * @param id Long
