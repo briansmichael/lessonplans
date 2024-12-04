@@ -31,7 +31,7 @@
 	<name>lessonplans</name>
 	<description>Lesson Plans</description>
 	<properties>
-		<java.version>11</java.version>
+		<java.version>21</java.version>
 		<cucumber.version>7.8.1</cucumber.version>
 		<sa.common.version>0.2.0</sa.common.version>
 		<hazelcast.version>5.2.0</hazelcast.version>
